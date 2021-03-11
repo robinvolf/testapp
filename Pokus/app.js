@@ -1,5 +1,5 @@
-function sayHello() {
-    window.alert("Hello!");
+function sayHello(event) {
+    console.log(event);
 }
 
 document.getElementById("button-finish").addEventListener("click", sayHello);
