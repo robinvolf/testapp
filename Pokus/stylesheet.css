@@ -1,0 +1,9 @@
+#question-img{
+    background-image: url(test-image3.jpg);
+    height: 450px;
+    width: auto;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    
+}
