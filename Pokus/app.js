@@ -8,7 +8,6 @@ let questions = [
       "Anim adipisicing minim cillum aliquip officia esse cillum non sint commodo irure amet aliqua.",
     ],
   },
-  
   {
     question: "Cillum irure et id laboris nulla aliquip esse sint ex nisi.?",
     answers: [
@@ -45,37 +44,28 @@ function setCurrentQuestion() {
   textParagraph.textContent = questions[questionIndex].question;
 }
 
-function setQuestionNumber() {
-  document.getElementById("question-number").textContent = (questionIndex + 1)+")";
+function setQuestionNumber(index) {
+  document.getElementById("question-number").textContent = index + 1 + ")";
 }
 
-function buttonDisableCheck() {
-  if (questionIndex == 0) {
-    document.getElementById("button-previous").disabled = true;
-    document.getElementById("button-next").disabled = false;
-  }
+function buttonDisableCheck(index, len) {
+  let lessThanMinimum = index <= 0;
+  let greatherThanMaximum = index >= len - 1;
 
-  else if (questionIndex == questions.length - 1) {
-    document.getElementById("button-next").disabled = true;
-    document.getElementById("button-previous").disabled = false;
-  }
-
-  else {
-    document.getElementById("button-previous").disabled = false;
-    document.getElementById("button-next").disabled = false;
-  }
+  document.getElementById("button-previous").disabled = lessThanMinimum;
+  document.getElementById("button-next").disabled = greatherThanMaximum;
 }
 
 function handlerClickNextButton() {
   setCurrentQuestion(++questionIndex);
-  setQuestionNumber();
-  buttonDisableCheck();
+  setQuestionNumber(questionIndex);
+  buttonDisableCheck(questionIndex, questions.length);
 }
 
 function handlerClickPreviousButton() {
   setCurrentQuestion(--questionIndex);
-  setQuestionNumber();
-  buttonDisableCheck();
+  setQuestionNumber(questionIndex);
+  buttonDisableCheck(questionIndex, questions.length);
 }
 
 document
