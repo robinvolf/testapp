@@ -1,6 +1,12 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
+const fs = require("fs")
+const path = require("path");
+
+
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -9,48 +15,60 @@ app.get('/', (req, res) => {
 app.use(express.static('public'))
 
 app.get('/data',function(req,res){
-	res.json(
-        [
-            {
-              question: "Cupidatat id ea irure eu officia?",
-              answers: [
-                "Veniam deserunt ut laboris deserunt pariatur irure voluptate enim exercitation ad consequat.",
-                "Et veniam dolor praesentium voluptates doloremque.",
-                "Do voluptate est do est aliquip incididunt incididunt consequat velit dolor veniam incididunt eiusmod.",
-                "Anim adipisicing minim cillum aliquip officia esse cillum non sint commodo irure amet aliqua.",
-              ],
-            },
-            {
-              question: "Cillum irure et id laboris nulla aliquip esse sint ex nisi.?",
-              answers: [
-                "Modi quidem tenetur blanditiis",
-                "Excepteur fugiat commodo in ullamco minim.",
-                "Reprehenderit accusamus qui sed illum quo.",
-                "Consequatur ratione officia ea officiis.",
-              ],
-            },
-            {
-              question: "Vestibulum tincidunt faucibus placerat.?",
-              answers: [
-                "Debitis consequatur explicabo ut..",
-                "Delectus reiciendis amet omnis sunt.",
-                "Do voluptate est do est aliquip incididunt incididunt consequat velit dolor veniam incididunt eiusmod.",
-                "Quos illum et est fugit veritatis ipsam.",
-              ],
-            },
-            {
-              question: "Proin dignissim vehicula vulputate.?",
-              answers: [
-                "Impedit perspiciatis deserunt cumque sapiente consequatur..",
-                "Omnis et in asperiores quam tempora non.",
-                "Laboriosam commodi maiores aut nihil est.",
-                "Cumque et dicta neque quia. ",
-              ],
-            },
-        ]
-    );
+  fs.readFile(path.join(__dirname, 'test1.json'), function(err,data){
+    res.json(JSON.parse(data.toString()));
+    if (err) {
+      return console.error(err);
+    }
+  })
 });
 
+
+app.post('/data', function(req,res)
+  {
+
+    let receivedAnswers = req.body;
+    let pointsIfRight = 2;
+    let pointsIfWrong = 1;
+    let recievedPoints = 0;
+    let maxPoints = 0;
+    let Result = 0;
+    
+    let correctAnswers = [
+      [true, false, false, false],
+      [false, true, false, false],
+      [false, false, true, false],
+      [false, false, false, true],
+    ]; 
+
+    for (i = 0; i < receivedAnswers.length; i++){
+      for (j = 0; j < receivedAnswers[i].length; j++){
+        if (Boolean(correctAnswers[i][j]) == true){
+          maxPoints += pointsIfRight;
+          if (Boolean(receivedAnswers[i][j]) == correctAnswers[i][j]){
+            recievedPoints += pointsIfRight;
+          }
+        }
+        else if (Boolean(receivedAnswers[i][j]) == true) {
+          recievedPoints -= pointsIfWrong;
+        }
+      }
+    }
+
+    if (recievedPoints >= 0){
+      Result = recievedPoints/maxPoints;
+    }
+    else{
+      Result = recievedPoints;
+    }
+
+    console.log("maxPoints: " + maxPoints);
+    console.log("recievedPoints: " + recievedPoints);
+    console.log("Result: " + Result); 
+    
+    res.json(correctAnswers);
+  }
+)
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })

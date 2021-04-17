@@ -6,55 +6,82 @@
     <title>Pokus s Bootstrap</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/test.css">
 
     <!-- Java script -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-
-    <link rel="stylesheet" href="stylesheet.css">
 </head>
 
 <body>
+    <div id="test">
+        <div class="container-fluid p-3 bg-primary text-white">
+            <h1>Název testu</h1>
+        </div>
 
-    <div class="container-fluid p-3 bg-primary text-white">
-        <h1>Název testu</h1>
-    </div>
+        <div class="container mt-3 mb-5 px-3 py-3 pt-3 pb-0 bg-light text-dark ">
+            <div class="row align-items-center">
+                <div class="col-sm-2">
+                    <h2 id="question-number">1)</h2>
+                </div>
 
-    <div class="container mt-3 px-3 pt-3 pb-0 bg-light text-dark ">
-        <div class="row align-items-center">
-            <div class="col-sm-2">
-                <h2 id="question-number">1)</h2>
+                <div class="col-sm-10">
+                    <p id="paragraph-question"></p>
+                </div>
             </div>
+        </div>
 
-            <div class="col-sm-10">
-                <p id="paragraph-question"></p>
+        <div class="container" id="block-answers">
+
+        </div>
+
+        <div class="container-fluid mt-5">
+            <div class="row">
+                <div class="col-sm d-flex justify-content-center">
+                    <button type="button" id="button-previous" disabled class="btn btn-primary btn-lg">Předchozí otázka</button>
+                </div>
+
+                <div class="col-sm d-flex justify-content-center">
+                    <button type="button" id="button-next" class="btn btn-primary btn-lg">Další otázka</button>
+                </div>
             </div>
+        </div>
+
+        <div id="button-finish" class="container mt-3">
+                
         </div>
     </div>
 
-    <div class="container mb-3" id="question-img">
-    </div>
+    <div id="test-list">
+        <div class="container-fluid p-3 bg-primary text-white">
+            <h1>Testovač 3000</h1>
+        </div>
+        
+        <div class="container mx-auto my-5 row justify-content-center">
+            <h3>Seznam testů</h3>
+        </div>
 
-    <div class="container" id="block-answers">
-
-    </div>
-
-    <div class="container-fluid mt-5">
-        <div class="row">
-            <div class="col-sm d-flex justify-content-center">
-                <button type="button" id="button-previous" disabled class="btn btn-primary btn-lg">Předchozí otázka</button>
-            </div>
-
-            <div class="col-sm d-flex justify-content-center">
-                <button type="button" id="button-next" class="btn btn-primary btn-lg">Další otázka</button>
-            </div>
+        <div class="container">
+            <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Jméno Testu</th>
+                    <th scope="col">Počet otázek</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr  id="test1">
+                    <th scope="row">test1</th>
+                    <td>4</td>
+                  </tr>
+                  <tr  id="test2">
+                    <th scope="row">test2</th>
+                    <td>6</td>
+                  </tr>
+                </tbody>
+              </table>
         </div>
     </div>
-
-    <div class="container mt-3">
-            <button type="button" id="button-finish" class="btn btn-danger btn-lg btn-block">UKONČIT TEST</button>
-    </div>
-
     <script src="app.js"></script>
 </body>
 </html>
