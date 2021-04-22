@@ -225,23 +225,21 @@ function generateResultTable(){
 		.then(data => {
       //fill in the table
       document.getElementById("result-table-body").innerHTML = "";
-      for (let i = 0; i < data.length; i++){
+      for (let i = data.length - 1; i >= 0; i--){
 
         let result = data[i].correct_answers - data[i].wrong_answers;
-        let filledTime = data[i].filled_time;
+        let filledTime = new Date(Date.parse(data[i].filled_time + "Z"));
 
         document.getElementById("result-table-body").innerHTML +=`
         <tr>
           <th scope="row">${data[i].student_group_name}</th>
           <td>${data[i].student_name}</td>
           <td>${data[i].questionnaire_name}</td>
-          <td>${filledTime}</td>
+          <td>${filledTime.toLocaleDateString() + " " + filledTime.toLocaleTimeString()}</td>
           <td>${result}</td>
 
         </tr>
         `
-
-        console.log(data[i].filled_time);
       }
 		})
 		.catch((error) => {
