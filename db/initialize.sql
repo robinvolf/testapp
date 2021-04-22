@@ -91,8 +91,8 @@ INSERT INTO questionnaire (
 	name,
 	description
 ) VALUES(
-	'Irure eu officia', 
-	'Quo quam enim voluptas voluptatem consequatur numquam sunt. Illo ipsa ad et inventore debitis incidunt accusamus totam. Quaerat sed ut distinctio maxime consequatur iure. Consectetur corrupti neque aut accusamus iusto minus. Beatae culpa perferendis dolorem. Voluptatem eos et quidem.'
+	'Násobilka', 
+	'Zvládne to každý průměrně vzdělaný gymplák!'
 );
 
 INSERT INTO question (
@@ -100,7 +100,7 @@ INSERT INTO question (
 	question_content
 ) VALUES(
 	(select max(questionnaire_id) from questionnaire),
-	'Cupidatat id ea irure eu officia?'
+	'Kolik je 5x3?'
 );
 
 INSERT INTO answer (
@@ -109,7 +109,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Veniam deserunt ut laboris deserunt pariatur irure voluptate enim exercitation ad consequat.',
+  '15',
   1
 );
 
@@ -119,7 +119,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Et veniam dolor praesentium voluptates doloremque.',
+  '4',
   0
 );
 
@@ -129,7 +129,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Do voluptate est do est aliquip incididunt incididunt consequat velit dolor veniam incididunt eiusmod.',
+  '16',
   0
 );
 
@@ -139,57 +139,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Anim adipisicing minim cillum aliquip officia esse cillum non sint commodo irure amet aliqua.',
-  0
-);
-
-
-
-INSERT INTO question (
-	questionnaire_id,
-	question_content
-) VALUES(
-	(select max(questionnaire_id) from questionnaire),
-	'Cillum irure et id laboris nulla aliquip esse sint ex nisi.?'
-);
-
-INSERT INTO answer (
-	question_id,
-	content,
-  correctness
-) VALUES(
-	(select max(question_id) from question),
-  'Modi quidem tenetur blanditiis',
-  0
-);
-
-INSERT INTO answer (
-	question_id,
-	content,
-  correctness
-) VALUES(
-	(select max(question_id) from question),
-  'Excepteur fugiat commodo in ullamco minim.',
-  1
-);
-
-INSERT INTO answer (
-	question_id,
-	content,
-  correctness
-) VALUES(
-	(select max(question_id) from question),
-  'Reprehenderit accusamus qui sed illum quo.',
-  1
-);
-
-INSERT INTO answer (
-	question_id,
-	content,
-  correctness
-) VALUES(
-	(select max(question_id) from question),
-  'Consequatur ratione officia ea officiis.',
+  '7',
   0
 );
 
@@ -200,7 +150,7 @@ INSERT INTO question (
 	question_content
 ) VALUES(
 	(select max(questionnaire_id) from questionnaire),
-	'Vestibulum tincidunt faucibus placerat.?'
+	'Co krát co je 20?'
 );
 
 INSERT INTO answer (
@@ -209,7 +159,17 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Debitis consequatur explicabo ut..',
+  '5 x 4',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '6 x 4',
   0
 );
 
@@ -219,8 +179,8 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Delectus reiciendis amet omnis sunt.',
-  0
+  '4 x 5',
+  1
 );
 
 INSERT INTO answer (
@@ -229,17 +189,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Do voluptate est do est aliquip incididunt incididunt consequat velit dolor veniam incididunt eiusmod.',
-  0
-);
-
-INSERT INTO answer (
-	question_id,
-	content,
-  correctness
-) VALUES(
-	(select max(question_id) from question),
-  'Quos illum et est fugit veritatis ipsam.',
+  '20 x 1',
   1
 );
 
@@ -250,7 +200,7 @@ INSERT INTO question (
 	question_content
 ) VALUES(
 	(select max(questionnaire_id) from questionnaire),
-	'Proin dignissim vehicula vulputate.?'
+	'Kolik je 20 x 5?'
 );
 
 INSERT INTO answer (
@@ -259,7 +209,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Impedit perspiciatis deserunt cumque sapiente consequatur..',
+  '140',
   0
 );
 
@@ -269,7 +219,17 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Omnis et in asperiores quam tempora non.',
+  '210',
+  0
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '100',
   1
 );
 
@@ -279,8 +239,18 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Laboriosam commodi maiores aut nihil est.',
+  '69',
   0
+);
+
+
+
+INSERT INTO question (
+	questionnaire_id,
+	question_content
+) VALUES(
+	(select max(questionnaire_id) from questionnaire),
+	'Co krát co je 12?'
 );
 
 INSERT INTO answer (
@@ -289,8 +259,38 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Cumque et dicta neque quia.',
-  0
+  '2 x 6',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '3 x 4',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '12 x 1',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '(5 +1) x 2',
+  1
 );
 
 /*

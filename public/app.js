@@ -236,7 +236,7 @@ function generateResultTable(){
           <td>${data[i].student_name}</td>
           <td>${data[i].questionnaire_name}</td>
           <td>${filledTime.toLocaleDateString() + " " + filledTime.toLocaleTimeString()}</td>
-          <td>${result}</td>
+          <td>${result} bodů</td>
 
         </tr>
         `
