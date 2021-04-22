@@ -126,13 +126,11 @@ function generateTestList(testList){
 //updates the global nameSurname
 function updateNameSurname() {
   nameSurname = document.getElementById("name-surname").value;
-  console.log("nameSurname = " + nameSurname);
 }
 
-//updates the global nameSurname
+//updates the global group
 function updateGroup() {
   group = document.getElementById("group").value;
-  console.log("group = " + group);
 }
 
 function returnToQuestionnaireList(){
@@ -183,7 +181,6 @@ function handlerClickToQuestionnaireRow(eventObject) {
 
 //sends answers and gets correct ones back
 function sendAnswers() {
-  console.log("finish button fired!");
   let request = {};
   request.questionnaireWorkedOn = questionnaireCurrentlyWorkedOn;
   request.answers = answerMemory;
@@ -199,7 +196,6 @@ function sendAnswers() {
   .then(response => response.json())
   .then(data => {
     questionnaireCurrentlyWorkedOn = null;
-    console.log('Success:', data);
     correctAnswers = data;
     testFinished = true;
     changeQuestion(globalQuestionIndex, questions.length);
@@ -227,22 +223,25 @@ function generateResultTable(){
   fetch('/results')
 		.then(response => response.json())
 		.then(data => {
-			console.log("results: ", data);
-
       //fill in the table
       document.getElementById("result-table-body").innerHTML = "";
       for (let i = 0; i < data.length; i++){
 
         let result = data[i].correct_answers - data[i].wrong_answers;
+        let filledTime = data[i].filled_time;
 
         document.getElementById("result-table-body").innerHTML +=`
         <tr>
           <th scope="row">${data[i].student_group_name}</th>
           <td>${data[i].student_name}</td>
           <td>${data[i].questionnaire_name}</td>
-          <td>${result} Body</td>
+          <td>${filledTime}</td>
+          <td>${result}</td>
+
         </tr>
         `
+
+        console.log(data[i].filled_time);
       }
 		})
 		.catch((error) => {
@@ -254,7 +253,6 @@ window.addEventListener("load", (event) => {
   fetch('/tests')
 		.then(response => response.json())
 		.then(data => {
-			console.log("success: ", data);
       questionnarieList = data;
       generateTestList(data);
       

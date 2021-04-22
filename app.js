@@ -10,8 +10,8 @@ const db = require("better-sqlite3")("db/TestDatabase.db");
 
 app.use(bodyParser.json())
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+app.get('/', (req, res) => { //redirects to main page (html.index)
+  res.redirect('index.html');
 })
 
 app.use(express.static('public'))
@@ -34,7 +34,7 @@ app.get('/tests',function(req,res){ //sends questionnaire list to user
   res.json(row);
 });
 
-app.get('/results',function(req,res){ //sends results to user
+app.get('/results',function(req,res){ //sends data for results table to user
   let row = db.prepare(`select 
 	sg.name as student_group_name, 
 	s.name as student_name,  
@@ -72,88 +72,51 @@ app.get('/results',function(req,res){ //sends results to user
 		s.name,
 		qe.name,
 		fq.filled_time;`).all();
+
   res.json(row);
 });
 
 
 
-app.post('/data', function(req,res)
+app.post('/data', function(req,res) //recieves answers from user, writes them into database and sends him correct ones back
   {
-    let receivedAnswers = req.body.answers;
-    let correctAnswers = [];
-    let pointsIfRight = 2;
-    let pointsIfWrong = 1;
-    let recievedPoints = 0;
-    let maxPoints = 0;
-    let Result = 0;
-    let questionsIndex = 0;
     let insertInfo;
 
-    console.log(req.body);
-       
     let studentGroupRow = db.prepare(`SELECT student_group_id FROM student_group WHERE name = ?`)
 	  .get(req.body.group);
+
     insertInfo = db.prepare("INSERT INTO student (name, student_group_id) VALUES (?,?)")
 	  .run(req.body.nameSurname, studentGroupRow.student_group_id);
+
     let studentRow = db.prepare(`SELECT * FROM student WHERE rowid = ?`)
 	  .get(insertInfo.lastInsertRowid);
+
     insertInfo = db.prepare("INSERT INTO filled_questionnaire (student_id, questionnaire_id) VALUES (?,?)")
 	  .run(studentRow.student_id, req.body.questionnaireWorkedOn);
+
     let filledQuestionnaireRow = db.prepare(`SELECT * FROM filled_questionnaire WHERE rowid = ?`)
 	  .get(insertInfo.lastInsertRowid);
 
     let stmt = db.prepare("INSERT INTO result (filled_questionnaire_id, student_id, answer_id) VALUES (?,?,?)");
 
     Object.keys(req.body.answers).forEach(answer_id => {
-	if ( req.body.answers[answer_id] ) {
-		stmt.run(filledQuestionnaireRow.filled_questionnaire_id, studentRow.student_id, answer_id);
-	}
+      if ( req.body.answers[answer_id] ) {
+        stmt.run(filledQuestionnaireRow.filled_questionnaire_id, studentRow.student_id, answer_id);
+      }
     });
 
-	correctAnswers = db.prepare(`SELECT a.answer_id, a.correctness
-		FROM question q
-			INNER JOIN answer a
-				on q.question_id = a.question_id
-		WHERE q.questionnaire_id = ?
-	`).all(req.body.questionnaireWorkedOn).reduce((acc, row) => {
-		acc[String(row.answer_id)] = Boolean(row.correctness);
-		return acc;
-	}, {});
-
-    //geets correct answers from database
-	  /*
-    let startingQuestionId = db.prepare(`SELECT question_id FROM question WHERE questionnaire_id = ${req.body.questionnaireWorkedOn} LIMIT 1`).get().question_id;
-    for (i = startingQuestionId; i < req.body.answers.length + startingQuestionId; i++){
-      correctAnswers[questionsIndex++] = db.prepare(`SELECT correctness FROM question INNER JOIN answer on answer.question_id = question.question_id WHERE questionnaire_id = ${req.body.questionnaireWorkedOn} AND	question.question_id = ${i}`).all();
-      questionsIndex;
-    }
-
-    //compares answers from user to correct answers
-    for (i = 0; i < receivedAnswers.length; i++){
-      for (j = 0; j < receivedAnswers[i].length; j++){
-        if (correctAnswers[i][j].correctness == 1){
-          maxPoints += pointsIfRight;
-          if (Boolean(receivedAnswers[i][j])){
-            recievedPoints += pointsIfRight;
-          }
-        }
-        else if (Boolean(receivedAnswers[i][j]) == true) {
-          recievedPoints -= pointsIfWrong;
-        }
-      }
-    }
-
-    if (recievedPoints >= 0){
-      Result = recievedPoints/maxPoints;
-    }
-    else{
-      Result = recievedPoints;
-    }
-    */
+    let correctAnswers = db.prepare(`SELECT a.answer_id, a.correctness
+      FROM question q
+        INNER JOIN answer a
+          on q.question_id = a.question_id
+      WHERE q.questionnaire_id = ?
+    `)
+    .all(req.body.questionnaireWorkedOn).reduce((acc, row) => {
+      acc[String(row.answer_id)] = Boolean(row.correctness);
+      return acc;
+      }, {});
 
     res.json(correctAnswers);
   }
 )
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+app.listen(port, () => {})
