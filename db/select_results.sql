@@ -30,7 +30,7 @@ select
 		left join result r
 			on fq.filled_questionnaire_id = r.filled_questionnaire_id
 				and a.answer_id = r.answer_id
-	GRoUP BY 
+	GROUP BY 
 		sg.name,
 		s.name,
 		qe.name,

@@ -212,6 +212,44 @@ function sendAnswers() {
   document.getElementById("button-finish").innerText = "ZPĚT NA SEZNAM TESTŮ";
 }
 
+function resultButtonHandler(){
+  document.getElementById("test-list").classList.add("hidden-block");
+  document.getElementById("result-table").classList.remove("hidden-block");
+  generateResultTable();
+}
+
+function backToTestListButtonHandler(){
+  document.getElementById("test-list").classList.remove("hidden-block");
+  document.getElementById("result-table").classList.add("hidden-block");
+}
+
+function generateResultTable(){
+  fetch('/results')
+		.then(response => response.json())
+		.then(data => {
+			console.log("results: ", data);
+
+      //fill in the table
+      document.getElementById("result-table-body").innerHTML = "";
+      for (let i = 0; i < data.length; i++){
+
+        let result = data[i].correct_answers - data[i].wrong_answers;
+
+        document.getElementById("result-table-body").innerHTML +=`
+        <tr>
+          <th scope="row">${data[i].student_group_name}</th>
+          <td>${data[i].student_name}</td>
+          <td>${data[i].questionnaire_name}</td>
+          <td>${result} Body</td>
+        </tr>
+        `
+      }
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+}
+
 window.addEventListener("load", (event) => {
   fetch('/tests')
 		.then(response => response.json())
@@ -227,6 +265,7 @@ window.addEventListener("load", (event) => {
   
   document.getElementById("test").classList.add("hidden-block");
   document.getElementById("button-finish").classList.add("hidden-block");
+  document.getElementById("result-table").classList.add("hidden-block");
 	document
 	  .getElementById("button-previous")
 	  .addEventListener("click", handlerClickPreviousButton);
@@ -245,4 +284,10 @@ window.addEventListener("load", (event) => {
   document
     .getElementById("group")
     .addEventListener("input", updateGroup);
+  document
+    .getElementById("result-button")
+    .addEventListener("click", resultButtonHandler);
+  document
+    .getElementById("back-to-test-list")
+    .addEventListener("click", backToTestListButtonHandler);
 });
