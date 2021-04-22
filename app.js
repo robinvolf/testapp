@@ -4,6 +4,8 @@ const app = express()
 const port = 3000
 const fs = require("fs")
 const path = require("path");
+const db = require("better-sqlite3")("db/TestDatabase.db");
+
 
 
 app.use(bodyParser.json())
@@ -14,38 +16,83 @@ app.get('/', (req, res) => {
 
 app.use(express.static('public'))
 
-app.get('/data',function(req,res){
-  fs.readFile(path.join(__dirname, 'test1.json'), function(err,data){
-    res.json(JSON.parse(data.toString()));
-    if (err) {
-      return console.error(err);
-    }
-  })
+app.get('/data',function(req,res){ //sends questionnaire data from databse to user
+  let questionnaire_id = req.query.questionnaire_id;
+  let questions = [];
+  questions = db.prepare(`SELECT question_content, question_id FROM question WHERE questionnaire_id = ${questionnaire_id}`).all();
+  let startingQuestionId = db.prepare(`SELECT question_id FROM question WHERE questionnaire_id = ${questionnaire_id} LIMIT 1`).get().question_id; 
+  let questionsIndex = 0;
+  for (i = startingQuestionId; i < questions.length + startingQuestionId; i++) { 
+    questions[questionsIndex].answers = db.prepare(`SELECT answer_id, content FROM question INNER JOIN answer on answer.question_id = question.question_id WHERE questionnaire_id = ${questionnaire_id} AND	question.question_id = ${i}`).all();
+    questionsIndex++;
+  }
+  res.json(questions);
 });
+
+app.get('/tests',function(req,res){ //sends questionnaire list to user
+  let row = db.prepare('SELECT questionnaire_id, name, description FROM questionnaire').all();
+  res.json(row);
+});
+
 
 
 app.post('/data', function(req,res)
   {
-
-    let receivedAnswers = req.body;
+    let receivedAnswers = req.body.answers;
+    let correctAnswers = [];
     let pointsIfRight = 2;
     let pointsIfWrong = 1;
     let recievedPoints = 0;
     let maxPoints = 0;
     let Result = 0;
-    
-    let correctAnswers = [
-      [true, false, false, false],
-      [false, true, false, false],
-      [false, false, true, false],
-      [false, false, false, true],
-    ]; 
+    let questionsIndex = 0;
+    let insertInfo;
 
+    console.log(req.body);
+       
+    let studentGroupRow = db.prepare(`SELECT student_group_id FROM student_group WHERE name = ?`)
+	  .get(req.body.group);
+    insertInfo = db.prepare("INSERT INTO student (name, student_group_id) VALUES (?,?)")
+	  .run(req.body.nameSurname, studentGroupRow.student_group_id);
+    let studentRow = db.prepare(`SELECT * FROM student WHERE rowid = ?`)
+	  .get(insertInfo.lastInsertRowid);
+    insertInfo = db.prepare("INSERT INTO filled_questionnaire (student_id, questionnaire_id) VALUES (?,?)")
+	  .run(studentRow.student_id, req.body.questionnaireWorkedOn);
+    let filledQuestionnaireRow = db.prepare(`SELECT * FROM filled_questionnaire WHERE rowid = ?`)
+	  .get(insertInfo.lastInsertRowid);
+
+    let stmt = db.prepare("INSERT INTO result (filled_questionnaire_id, student_id, answer_id) VALUES (?,?,?)");
+
+    Object.keys(req.body.answers).forEach(answer_id => {
+	if ( req.body.answers[answer_id] ) {
+		stmt.run(filledQuestionnaireRow.filled_questionnaire_id, studentRow.student_id, answer_id);
+	}
+    });
+
+	correctAnswers = db.prepare(`SELECT a.answer_id, a.correctness
+		FROM question q
+			INNER JOIN answer a
+				on q.question_id = a.question_id
+		WHERE q.questionnaire_id = ?
+	`).all(req.body.questionnaireWorkedOn).reduce((acc, row) => {
+		acc[String(row.answer_id)] = Boolean(row.correctness);
+		return acc;
+	}, {});
+
+    //geets correct answers from database
+	  /*
+    let startingQuestionId = db.prepare(`SELECT question_id FROM question WHERE questionnaire_id = ${req.body.questionnaireWorkedOn} LIMIT 1`).get().question_id;
+    for (i = startingQuestionId; i < req.body.answers.length + startingQuestionId; i++){
+      correctAnswers[questionsIndex++] = db.prepare(`SELECT correctness FROM question INNER JOIN answer on answer.question_id = question.question_id WHERE questionnaire_id = ${req.body.questionnaireWorkedOn} AND	question.question_id = ${i}`).all();
+      questionsIndex;
+    }
+
+    //compares answers from user to correct answers
     for (i = 0; i < receivedAnswers.length; i++){
       for (j = 0; j < receivedAnswers[i].length; j++){
-        if (Boolean(correctAnswers[i][j]) == true){
+        if (correctAnswers[i][j].correctness == 1){
           maxPoints += pointsIfRight;
-          if (Boolean(receivedAnswers[i][j]) == correctAnswers[i][j]){
+          if (Boolean(receivedAnswers[i][j])){
             recievedPoints += pointsIfRight;
           }
         }
@@ -61,11 +108,8 @@ app.post('/data', function(req,res)
     else{
       Result = recievedPoints;
     }
+    */
 
-    console.log("maxPoints: " + maxPoints);
-    console.log("recievedPoints: " + recievedPoints);
-    console.log("Result: " + Result); 
-    
     res.json(correctAnswers);
   }
 )

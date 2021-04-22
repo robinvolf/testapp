@@ -4,13 +4,22 @@ let questions;
 let answerMemory = [];
 let testFinished = false;
 let correctAnswers = [];
-
 let globalQuestionIndex = 0;
+let questionnaireCurrentlyWorkedOn;
+let questionnarieList = [];
+let nameSurname;
+let group = "4.A";
 
-////renders the question "questions" array
+
+//renders the question "questions" array
 function setCurrentQuestion(questionIndex) {
   let textParagraph = document.getElementById("paragraph-question");
-  textParagraph.textContent = questions[questionIndex].question;
+  textParagraph.textContent = questions[questionIndex].question_content;
+}
+
+//renders name of test on the top
+function renderQuestionnaireName(name) {
+  document.getElementById("questionnaire-name").innerHTML = name;
 }
 
 //changes the question number at the upper left
@@ -35,7 +44,7 @@ function renderQuestions(questionIndex) {
     //if the test is finished highlights correct answers in green
     let correctOrNot = "";
     if (testFinished == true){
-      if(correctAnswers[questionIndex][i] == true){
+      if(correctAnswers[selectedAnswers[i].answer_id] === true){
         correctOrNot = 'style="color:green;"';
       }
     }
@@ -43,8 +52,8 @@ function renderQuestions(questionIndex) {
     answerHTML =
       answerHTML +
       `<div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" data-index="${i}" value="" id="flexCheckDefault${i+1}" ${disabledOrDefault}>
-            <label class="form-check-label" for="flexCheckDefault${i+1}" ${correctOrNot}>${selectedAnswers[i]}</label>
+            <input class="form-check-input" type="checkbox" data-index="${i}" data-answer-id="${selectedAnswers[i].answer_id}" value="" id="flexCheckDefault${i+1}" ${disabledOrDefault}>
+            <label class="form-check-label" for="flexCheckDefault${i+1}" ${correctOrNot}>${selectedAnswers[i].content}</label>
         </div>`;
   }
   document.getElementById("block-answers").innerHTML = answerHTML;
@@ -52,9 +61,10 @@ function renderQuestions(questionIndex) {
 
 //displays already selected answers when revisiting a question
 function loadSelectedQuestions(questionIndex) {
+	let checkbox;
   for (let i = 0; i < questions[questionIndex].answers.length; i++) {
-      document.getElementById(`flexCheckDefault${i+1}`).checked = 
-        Boolean(answerMemory[questionIndex][i]);
+	checkbox = document.getElementById(`flexCheckDefault${i+1}`);
+      checkbox.checked = Boolean(answerMemory[checkbox.dataset.answerId]);
   }
 }
 
@@ -75,11 +85,15 @@ function changeQuestion(questionIndex, questionsLength) {
   renderQuestions(questionIndex);
   loadSelectedQuestions(questionIndex);
 
+  //shows finish button at the end of test
   if(questionIndex == questions.length - 1){
-    summonFinishButton();
+    document.getElementById("button-finish").classList.remove("hidden-block");
+  }
+  else if(document.getElementById("button-finish").innerText == "ZPĚT NA SEZNAM TESTŮ") {
+    document.getElementById("button-finish").classList.remove("hidden-block");
   }
   else{
-    document.getElementById("button-finish").innerHTML ="";
+    document.getElementById("button-finish").classList.add("hidden-block");
   }  
 }
 
@@ -95,65 +109,124 @@ function handlerClickPreviousButton() {
 
 //on change writes selected answers into answer memory
 function handlerCheckboxMemory(checkboxEventObject) {
-  let answerIndex = Number(checkboxEventObject.target.dataset.index);
-    answerMemory[globalQuestionIndex][answerIndex] = Boolean(checkboxEventObject.target.checked);
+    answerMemory[checkboxEventObject.target.dataset.answerId] = Boolean(checkboxEventObject.target.checked);
 }
 
-//generates memory for answers when questions are received
-function generateAnswerMemory() {
-  for (let i = 0; i < questions.length; i++) {
-    answerMemory[i] = [];
-    for (let j = 0; j < questions[i].answers.length; j++) {
-      answerMemory[i][j] = null;
-    }
+//generates table of questionnaires
+function generateTestList(testList){
+  for (let i = 0; i < testList.length; i++){
+    document.getElementById("test-list-table-body").innerHTML += 
+    `<tr  class="questionnaire-row" data-questionnaire-id="${testList[i].questionnaire_id}">
+      <th scope="">${testList[i].name}</th>
+      <td>${testList[i].description}</td>
+    </tr>`;
   }
 }
 
-function summonFinishButton() {
-  document.getElementById("button-finish").innerHTML = '<button type="button" id="button-finish" class="btn btn-danger btn-lg btn-block">UKONČIT TEST</button>';
-  document  
-    .getElementById("button-finish")
-    .addEventListener("click", sendAnswers);
+//updates the global nameSurname
+function updateNameSurname() {
+  nameSurname = document.getElementById("name-surname").value;
+  console.log("nameSurname = " + nameSurname);
 }
 
-function goToTest() {
-  document.getElementById("test-list").classList.add("hidden-block");
-  document.getElementById("test").classList.remove("hidden-block");
-  fetch('/data')  //requests the questions and answers from the server
-		.then(response => response.json())
-		.then(data => {
-			questions = data;
-      generateAnswerMemory();
-			changeQuestion(globalQuestionIndex, questions.length);
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
+//updates the global nameSurname
+function updateGroup() {
+  group = document.getElementById("group").value;
+  console.log("group = " + group);
+}
+
+function returnToQuestionnaireList(){
+  questions = [];
+  testFinished = false;
+  correctAnswers = [];
+  globalQuestionIndex = 0;
+  questionnaireCurrentlyWorkedOn = "";
+
+  document.getElementById("test")
+    .classList.add("hidden-block");
+  document.getElementById("test-list")
+    .classList.remove("hidden-block");
+  document.getElementById("button-finish").innerText = "UKONČIT TEST";
+}
+
+//Selects test
+function handlerClickToQuestionnaireRow(eventObject) {
+  if (document.getElementById("name-surname").value == ""){
+    document.getElementById("no-name-error-message").innerText = "Vyplň své jméno a třídu!";
+  }
+  else {
+    let questionnaireId =  eventObject.target.parentElement.dataset.questionnaireId;
+    questionnaireCurrentlyWorkedOn = questionnaireId;
+
+    document.getElementById("test-list").classList.add("hidden-block");
+    document.getElementById("test").classList.remove("hidden-block");
+    document
+    .getElementById("button-finish")
+    .addEventListener("click", sendAnswers, {once:true});
+
+    fetch(`/data?questionnaire_id=${questionnaireId}`)  //requests the questionnarie from the server
+      .then(response => response.json())
+      .then(data => {
+        questions = data;
+      let questionnaire = questionnarieList.find(questionnaire => questionnaire.questionnaire_id === parseInt(questionnaireId, 10));
+
+        renderQuestionnaireName(questionnaire.name);
+        answerMemory = {};
+        changeQuestion(globalQuestionIndex, questions.length);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+      document.getElementById("no-name-error-message").innerText = "";
+  }
 }
 
 //sends answers and gets correct ones back
 function sendAnswers() {
+  console.log("finish button fired!");
+  let request = {};
+  request.questionnaireWorkedOn = questionnaireCurrentlyWorkedOn;
+  request.answers = answerMemory;
+  request.nameSurname = nameSurname;
+  request.group = group;
   fetch('/data', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(answerMemory),
-})
-.then(response => response.json())
-.then(data => {
-  console.log('Success:', data);
-  correctAnswers = data;
-  testFinished = true;
-  changeQuestion(globalQuestionIndex, questions.length);
-})
-.catch((error) => {
-  console.error('Error:', error);
-});
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  })
+  .then(response => response.json())
+  .then(data => {
+    questionnaireCurrentlyWorkedOn = null;
+    console.log('Success:', data);
+    correctAnswers = data;
+    testFinished = true;
+    changeQuestion(globalQuestionIndex, questions.length);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+
+  document.getElementById("button-finish").addEventListener("click", returnToQuestionnaireList, {once:true});
+  document.getElementById("button-finish").innerText = "ZPĚT NA SEZNAM TESTŮ";
 }
 
 window.addEventListener("load", (event) => {
+  fetch('/tests')
+		.then(response => response.json())
+		.then(data => {
+			console.log("success: ", data);
+      questionnarieList = data;
+      generateTestList(data);
+      
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+  
   document.getElementById("test").classList.add("hidden-block");
+  document.getElementById("button-finish").classList.add("hidden-block");
 	document
 	  .getElementById("button-previous")
 	  .addEventListener("click", handlerClickPreviousButton);
@@ -164,6 +237,12 @@ window.addEventListener("load", (event) => {
 	  .getElementById("block-answers")
 	  .addEventListener("change", handlerCheckboxMemory);
   document
-    .getElementById("test1")
-    .addEventListener("click", goToTest)
+    .getElementById("test-list-table")
+    .addEventListener("click", handlerClickToQuestionnaireRow)
+  document
+    .getElementById("name-surname")
+    .addEventListener("input", updateNameSurname);
+  document
+    .getElementById("group")
+    .addEventListener("input", updateGroup);
 });
