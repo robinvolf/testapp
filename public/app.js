@@ -208,43 +208,8 @@ function sendAnswers() {
   document.getElementById("button-finish").innerText = "ZPĚT NA SEZNAM TESTŮ";
 }
 
-function resultButtonHandler(){
-  document.getElementById("test-list").classList.add("hidden-block");
-  document.getElementById("result-table").classList.remove("hidden-block");
-  generateResultTable();
-}
-
-function backToTestListButtonHandler(){
-  document.getElementById("test-list").classList.remove("hidden-block");
-  document.getElementById("result-table").classList.add("hidden-block");
-}
-
-function generateResultTable(){
-  fetch('/results')
-		.then(response => response.json())
-		.then(data => {
-      //fill in the table
-      document.getElementById("result-table-body").innerHTML = "";
-      for (let i = data.length - 1; i >= 0; i--){
-
-        let result = data[i].correct_answers - data[i].wrong_answers;
-        let filledTime = new Date(Date.parse(data[i].filled_time + "Z"));
-
-        document.getElementById("result-table-body").innerHTML +=`
-        <tr>
-          <th scope="row">${data[i].student_group_name}</th>
-          <td>${data[i].student_name}</td>
-          <td>${data[i].questionnaire_name}</td>
-          <td>${filledTime.toLocaleDateString() + " " + filledTime.toLocaleTimeString()}</td>
-          <td>${result} bodů</td>
-
-        </tr>
-        `
-      }
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
+function loginRedirectButtonHandler(){
+  window.location.href = "/login.html";
 }
 
 window.addEventListener("load", (event) => {
@@ -261,8 +226,7 @@ window.addEventListener("load", (event) => {
   
   document.getElementById("test").classList.add("hidden-block");
   document.getElementById("button-finish").classList.add("hidden-block");
-  document.getElementById("result-table").classList.add("hidden-block");
-	document
+  document
 	  .getElementById("button-previous")
 	  .addEventListener("click", handlerClickPreviousButton);
 	document
@@ -273,7 +237,7 @@ window.addEventListener("load", (event) => {
 	  .addEventListener("change", handlerCheckboxMemory);
   document
     .getElementById("test-list-table")
-    .addEventListener("click", handlerClickToQuestionnaireRow)
+    .addEventListener("click", handlerClickToQuestionnaireRow);
   document
     .getElementById("name-surname")
     .addEventListener("input", updateNameSurname);
@@ -281,9 +245,6 @@ window.addEventListener("load", (event) => {
     .getElementById("group")
     .addEventListener("input", updateGroup);
   document
-    .getElementById("result-button")
-    .addEventListener("click", resultButtonHandler);
-  document
-    .getElementById("back-to-test-list")
-    .addEventListener("click", backToTestListButtonHandler);
+    .getElementById("login-redirect-button")
+    .addEventListener("click", loginRedirectButtonHandler);
 });

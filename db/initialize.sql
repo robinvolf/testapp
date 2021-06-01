@@ -5,6 +5,7 @@ DROP TABLE student_group;
 DROP TABLE student;
 DROP TABLE result;
 DROP TABLE filled_questionnaire;
+DROP TABLE login_info;
 
 CREATE TABLE questionnaire (
 	questionnaire_id integer PRIMARY KEY AUTOINCREMENT,
@@ -56,6 +57,20 @@ CREATE TABLE result (
 	FOREIGN KEY(student_id) REFERENCES student(student_id),
 	FOREIGN KEY(answer_id) REFERENCES answer(answer_id)
 	FOREIGN KEY(filled_questionnaire_id) REFERENCES filled_questionnaire(filled_questionnaire_id)
+);
+
+CREATE TABLE login_info (
+	username text NOT NULL UNIQUE,
+	password text NOT NULL
+);
+
+INSERT INTO login_info (
+	username,
+	password 
+)
+VALUES(
+	'Robin Volf',
+	'e3bd2f76e9f50f3246c6e48960f64f76'
 );
 
 INSERT INTO student_group (

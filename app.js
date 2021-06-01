@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const crypto = require('crypto');
 const app = express()
 const port = 3000
 const fs = require("fs")
@@ -8,11 +9,86 @@ const db = require("better-sqlite3")("db/TestDatabase.db");
 
 
 
-app.use(bodyParser.json())
+app.use(require('body-parser').json());
 
 app.get('/', (req, res) => { //redirects to main page (html.index)
-  res.redirect('index.html');
+  res.redirect('index.html'); //index.html
 })
+
+app.post('/login', function(req,res) //recieves login info
+  {
+    let password = req.body.password;
+    
+    let salt = "This is a secret";
+
+    let md5Hasher = crypto.createHmac("md5", salt);
+
+    let hashedPassword = md5Hasher.update(password).digest("hex");
+
+    console.log("username:", req.body.username);
+    console.log("password:", hashedPassword);
+
+    let databaseUsername = req.body.username;
+    let dbStatement = db.prepare(`SELECT password FROM login_info WHERE username = ?`)
+    let databasePassword = dbStatement.all(databaseUsername);
+
+    console.log("databasepassword length:", databasePassword.length);
+
+    let correctpassword = false;
+    if (databasePassword.length > 0){
+      console.log("dbpass.len > 0");
+      if(databasePassword[0].password == hashedPassword){
+        console.log("Correct Password!");
+        correctpassword = true;
+        
+        // send results in
+        let row = db.prepare(`select 
+        sg.name as student_group_name, 
+        s.name as student_name,  
+        qe.name as questionnaire_name, 
+        fq.filled_time,
+        SUM(
+          CASE
+              WHEN r.answer_id IS NOT NULL and a.correctness = 1 THEN 1
+            ELSE 0
+          END
+        ) as correct_answers,
+        SUM(
+          CASE
+              WHEN r.answer_id IS NOT NULL and a.correctness = 0 THEN 1
+            ELSE 0
+          END
+        ) as wrong_answers,
+        count(*) as all_answers
+        from filled_questionnaire fq
+          inner join  questionnaire qe
+            on fq.questionnaire_id = qe.questionnaire_id
+          inner join  question q
+            on fq.questionnaire_id = q.questionnaire_id
+          inner join answer a
+            on q.question_id = a.question_id
+          inner join student s
+            on fq.student_id = s.student_id
+          inner join student_group sg
+            on sg.student_group_id = s.student_group_id
+          left join result r
+            on fq.filled_questionnaire_id = r.filled_questionnaire_id
+              and a.answer_id = r.answer_id
+        GROUP BY 
+          sg.name,
+          s.name,
+          qe.name,
+          fq.filled_time;`).all();
+        
+        res.json(row);
+      }
+    }
+
+    if (!correctpassword){
+      res.json("incorrect password");
+    }
+  }
+);
 
 app.use(express.static('public'))
 
@@ -33,50 +109,6 @@ app.get('/tests',function(req,res){ //sends questionnaire list to user
   let row = db.prepare('SELECT questionnaire_id, name, description FROM questionnaire').all();
   res.json(row);
 });
-
-app.get('/results',function(req,res){ //sends data for results table to user
-  let row = db.prepare(`select 
-	sg.name as student_group_name, 
-	s.name as student_name,  
-	qe.name as questionnaire_name, 
-	fq.filled_time,
-	SUM(
-		CASE
-		     WHEN r.answer_id IS NOT NULL and a.correctness = 1 THEN 1
-			ELSE 0
-		END
-	) as correct_answers,
-	SUM(
-		CASE
-		     WHEN r.answer_id IS NOT NULL and a.correctness = 0 THEN 1
-			ELSE 0
-		END
-	) as wrong_answers,
-	count(*) as all_answers
-	from filled_questionnaire fq
-		inner join  questionnaire qe
-			on fq.questionnaire_id = qe.questionnaire_id
-		inner join  question q
-			on fq.questionnaire_id = q.questionnaire_id
-		inner join answer a
-			on q.question_id = a.question_id
-		inner join student s
-			on fq.student_id = s.student_id
-		inner join student_group sg
-			on sg.student_group_id = s.student_group_id
-		left join result r
-			on fq.filled_questionnaire_id = r.filled_questionnaire_id
-				and a.answer_id = r.answer_id
-	GROUP BY 
-		sg.name,
-		s.name,
-		qe.name,
-		fq.filled_time;`).all();
-
-  res.json(row);
-});
-
-
 
 app.post('/data', function(req,res) //recieves answers from user, writes them into database and sends him correct ones back
   {
