@@ -101,6 +101,19 @@ VALUES(
   '4.D'
 );
 
+INSERT INTO student_group (
+  name
+)
+VALUES(
+  '8.OA'
+);
+
+INSERT INTO student_group (
+  name
+)
+VALUES(
+  '8.OB'
+);
 
 INSERT INTO questionnaire (
 	name,
@@ -316,8 +329,8 @@ INSERT INTO questionnaire (
 	name,
 	description
 ) VALUES(
-	'Iure voluptas animi modi.', 
-	'Minus voluptate nam eaque beatae et esse. Eos voluptas fuga sit accusantium consequatur dolores excepturi vel. Id consequuntur deserunt quo.'
+	'T.E.S.T', 
+	'Testovací Estráda Skrz Trýznění. Nulové skóre nepřípustno, natahování povoleno.'
 );
 
 INSERT INTO question (
@@ -325,7 +338,7 @@ INSERT INTO question (
 	question_content
 ) VALUES(
 	(select max(questionnaire_id) from questionnaire),
-	'Cum amet quod harum est et quos fugit enim?'
+	'Kolik je hodin?'
 );
 
 INSERT INTO answer (
@@ -334,7 +347,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Ut in non mollitia nostrum',
+  '10',
   0
 );
 
@@ -344,7 +357,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Optio et aspernatur ducimus',
+  '11',
   1
 );
 
@@ -354,7 +367,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Perspiciatis totam hic eos eos quod quia quibusdam voluptate.',
+  '12.',
   0
 );
 
@@ -364,18 +377,26 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Aliquam ut ducimus suscipit pariatur in adipisci qui.',
-  1
+  '13',
+  0
 );
 
-
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  'Nekonečně mnoho..',
+  0
+);
 
 INSERT INTO question (
 	questionnaire_id,
 	question_content
 ) VALUES(
 	(select max(questionnaire_id) from questionnaire),
-	'Harum quibusdam repudiandae praesentium consectetur?'
+	'Kdy byl objeven americký kontinent?'
 );
 
 INSERT INTO answer (
@@ -384,7 +405,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Distinctio asperiores adipisci autem eaque error rem vero',
+  '1434',
   0
 );
 
@@ -394,7 +415,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Optio et aspernatur ducimus',
+  '1518',
   0
 );
 
@@ -404,7 +425,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Eum possimus velit laborum ut sequi',
+  '1492',
   1
 );
 
@@ -414,18 +435,36 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Architecto autem qui repudiandae ducimus temporibus',
+  '1507',
   0
 );
 
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '1600',
+  0
+);
 
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  'V století dozajista patnáctém',
+  1
+);
 
 INSERT INTO question (
 	questionnaire_id,
 	question_content
 ) VALUES(
 	(select max(questionnaire_id) from questionnaire),
-	'Ut itaque itaque deserunt non eum?'
+	'Která planeta je nejblíže k Zemi?'
 );
 
 INSERT INTO answer (
@@ -434,7 +473,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Qui quis eum sit enim dolorem id et.',
+  'hAHa ZěMě',
   0
 );
 
@@ -444,7 +483,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Magni esse laboriosam consequatur nulla nihil qui et et.',
+  'Je měsíc technicky vzato planeta?',
   0
 );
 
@@ -454,7 +493,7 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Sit sed eum natus sed labore reprehenderit voluptatum ea',
+  'Venuše',
   1
 );
 
@@ -464,6 +503,132 @@ INSERT INTO answer (
   correctness
 ) VALUES(
 	(select max(question_id) from question),
-  'Totam facere tenetur et.',
+  'Mars',
   1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  'Merkur',
+  1
+);
+
+INSERT INTO question (
+	questionnaire_id,
+	question_content
+) VALUES(
+	(select max(questionnaire_id) from questionnaire),
+	'Za předpokladu znalosti 2 maturitních otázek z programování a naprosté nevědomosti ostatních, jaká je pravděpodobnost, že námi myšlený student bude schopen odmaturovat z programování?'
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '10 %',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  'No.. nic moc',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  'e %',
+  0
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '≈ 10 %',
+  1
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  'přesně 13,64 %',
+  0
+);
+
+INSERT INTO question (
+	questionnaire_id,
+	question_content
+) VALUES(
+	(select max(questionnaire_id) from questionnaire),
+	'Jakou známku by si tento projekt zasloužil?'
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '1',
+  0
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '2',
+  0
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '3',
+  0
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '4',
+  0
+);
+
+INSERT INTO answer (
+	question_id,
+	content,
+  correctness
+) VALUES(
+	(select max(question_id) from question),
+  '5',
+  0
 );
